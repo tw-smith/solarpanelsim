@@ -24,7 +24,7 @@ class AngleCalculator:
         sun_longitude = self.get_sun_longitude()
         return math.asin(
             math.cos(sun_longitude)*math.sin(self.raan)*math.sin(self.inclination) -
-            math.cos(sun_longitude)*math.cos(self.obliquity)*math.cos(self.raan)*math.sin(self.inclination) +
+            math.sin(sun_longitude)*math.cos(self.obliquity)*math.cos(self.raan)*math.sin(self.inclination) +
             math.sin(sun_longitude)*math.sin(self.obliquity)*math.cos(self.inclination)
         )
 

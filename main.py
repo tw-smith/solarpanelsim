@@ -25,14 +25,14 @@ orekit.pyhelpers.setup_orekit_curdir()
 #TODO investigate possible offset between UTC and the time we use to calculate J2000 offset in AngleCalculators?
 utc = TimeScalesFactory.getUTC()
 
-apogee = 8000 * 1000
+apogee = 500 * 1000
 perigee = 500 * 1000
-i = 0.0
+i = 45.0
 omega = 0.0
 raan = 0.0
-initial_lv = 180.0
+initial_lv = 0.0
 initialDate = AbsoluteDate(2023, 3, 21, 12, 0, 0.0, utc)
-finalDate = AbsoluteDate(2023, 3, 22, 12, 0, 0.0, utc) # TODO input checks e.g. is initialDate before final date, apogee and perigee etc
+finalDate = AbsoluteDate(2023, 3, 21, 18, 0, 0.0, utc) # TODO input checks e.g. is initialDate before final date, apogee and perigee etc
 timeStep = float(0.05*3600)
 panel_area = 1
 panel_efficiency = 0.3 #TODO look up typical values
