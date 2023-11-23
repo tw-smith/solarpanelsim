@@ -60,5 +60,5 @@ for state in state_history:
         'power': power_res
     })
 
-user_interface.plot_power_output(results)
-user_interface.write_to_csv(results)
+user_interface.plot_power_output(results, orbit)
+user_interface.write_to_csv(results, orbit)
