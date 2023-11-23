@@ -4,60 +4,39 @@ import sys
 import orekit
 vm = orekit.initVM() #TODO move this further down if we can
 import orekit.pyhelpers
-from org.orekit.time import AbsoluteDate, TimeScalesFactory
 from orbit_propagator import OrbitCreator, OrbitPropagator
 from angle_calculators import AngleCalculator
-from user_interface import OutputManager
-from errors_and_validation import UserInputValidator
+from user_interface import OutputManager, InputManager
 import panel_power_calculator
 
-if not os.path.isfile('orekit-data.zip'):
-    orekit.pyhelpers.download_orekit_data_curdir()
-orekit.pyhelpers.setup_orekit_curdir()
 
-# User  input TODO: move this to file reader in io module
+def solarsimulator(input_params=None):
+    if not os.path.isfile('orekit-data.zip'):
+        orekit.pyhelpers.download_orekit_data_curdir()
+    orekit.pyhelpers.setup_orekit_curdir()
+    if not input_params:
+        input_params = sys.argv[1]
+    input_manager = InputManager(input_params)
+    orbit_creation_parameters, propagation_parameters, panel_parameters = input_manager.get_parameter_inputs()
 
-#TODO investigate possible offset between UTC and the time we use to calculate J2000 offset in AngleCalculators?
-utc = TimeScalesFactory.getUTC()
+    orbit = OrbitCreator(orbit_creation_parameters).get_orbit()
+    state_history = OrbitPropagator(orbit, propagation_parameters).propagate_orbit()
+
+    results = []
+    for state in state_history:
+        angle_calculator = AngleCalculator(state, orbit)
+        power_res = panel_power_calculator.calculate_panel_power(panel_parameters, angle_calculator)
+        date_string = datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339())
+        results.append({
+            'date': date_string,
+            'power': power_res
+        })
+
+    output_manager = OutputManager(results, orbit)
+    output_manager.write_to_csv()
+    output_manager.plot_power_output()
 
 
 
-propagation_parameters = {
-    'initial_date': AbsoluteDate(2023, 3, 21, 12, 0, 0.0, utc),
-    'final_date': AbsoluteDate(2023, 3, 21, 18, 0, 0.0, utc),
-    'timestep': float(0.05*3600)
-}
-
-orbit_creation_parameters = {
-    'apogee': 500*1000,
-    'perigee': 500*1000,
-    'i': 0,
-    'omega': 0.0,
-    'raan': 45.0,
-    'initial_lv': 0.0,
-    'initial_date': propagation_parameters['initial_date']
-}
-
-panel_parameters = {
-    'panel_area': 1.0,
-    'panel_efficiency': 0.3
-}
-
-UserInputValidator(propagation_parameters, orbit_creation_parameters, panel_parameters).validate_input()
-
-orbit = OrbitCreator(orbit_creation_parameters).get_orbit()
-state_history = OrbitPropagator(orbit, propagation_parameters).propagate_orbit()
-
-results = []
-for state in state_history:
-    angle_calculator = AngleCalculator(state, orbit)
-    power_res = panel_power_calculator.calculate_panel_power(panel_parameters, angle_calculator)
-    date_string = datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339())
-    results.append({
-        'date': date_string,
-        'power': power_res
-    })
-
-output_manager = OutputManager(results, orbit)
-output_manager.plot_power_output()
-output_manager.write_to_csv()
+if __name__ == '__main__':
+    solarsimulator()

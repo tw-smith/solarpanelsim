@@ -3,7 +3,7 @@ from org.orekit.time import AbsoluteDate
 
 
 class AngleCalculator:
-    def __init__(self, spacecraft_state, keplerian_orbit): # TODO can we get RAAN from spacecraft state rather than having to import kep orbit?
+    def __init__(self, spacecraft_state, keplerian_orbit):
         orbit = keplerian_orbit
         self.raan = orbit.getRightAscensionOfAscendingNode()
         self.inclination = orbit.getI()
