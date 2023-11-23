@@ -32,6 +32,7 @@ def solarsimulator(input_params=None):
             'power': power_res
         })
 
+    # TODO functionality to allow user whether they want to save these csv/plots via input.json
     output_manager = OutputManager(results, orbit)
     output_manager.write_to_csv()
     output_manager.plot_power_output()
