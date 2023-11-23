@@ -2,11 +2,13 @@ import math
 
 import orekit
 
+import user_interface
 import panel_power_calculator
 
 vm = orekit.initVM()
 
 import os.path
+import datetime
 import orekit.pyhelpers
 from org.orekit.time import AbsoluteDate, TimeScalesFactory
 
@@ -28,9 +30,9 @@ perigee = 500 * 1000
 i = 0.0
 omega = 0.0
 raan = 0.0
-initial_lv = 0.0
+initial_lv = 180.0
 initialDate = AbsoluteDate(2023, 3, 21, 12, 0, 0.0, utc)
-finalDate = AbsoluteDate(2023, 3, 25, 12, 0, 0.0, utc) # TODO input checks e.g. is initialDate before final date, apogee and perigee etc
+finalDate = AbsoluteDate(2023, 3, 22, 12, 0, 0.0, utc) # TODO input checks e.g. is initialDate before final date, apogee and perigee etc
 timeStep = float(0.05*3600)
 panel_area = 1
 panel_efficiency = 0.3 #TODO look up typical values
@@ -49,9 +51,11 @@ print(orbit)
 state_history = OrbitPropagator(orbit, initialDate, finalDate, timeStep).propagate_orbit()
 
 power = []
+date = []
 for state in state_history:
     angle_calculator = AngleCalculator(state, orbit)
     power.append(panel_power_calculator.calculate_panel_power(panel_area, angle_calculator, panel_efficiency))
-
+    date.append(datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339()))
 print(power)
 
+user_interface.plot_power_output(date, power)
