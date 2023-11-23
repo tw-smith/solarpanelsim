@@ -25,7 +25,7 @@ orekit.pyhelpers.setup_orekit_curdir()
 #TODO investigate possible offset between UTC and the time we use to calculate J2000 offset in AngleCalculators?
 utc = TimeScalesFactory.getUTC()
 
-apogee = 500 * 1000
+apogee = 8000 * 1000
 perigee = 500 * 1000
 i = 0.0
 omega = 0.0
@@ -50,12 +50,15 @@ orbit = OrbitCreator(
 print(orbit)
 state_history = OrbitPropagator(orbit, initialDate, finalDate, timeStep).propagate_orbit()
 
-power = []
-date = []
+results = []
 for state in state_history:
     angle_calculator = AngleCalculator(state, orbit)
-    power.append(panel_power_calculator.calculate_panel_power(panel_area, angle_calculator, panel_efficiency))
-    date.append(datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339()))
-print(power)
+    power_res = panel_power_calculator.calculate_panel_power(panel_area, angle_calculator, panel_efficiency)
+    date_string = datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339())
+    results.append({
+        'date': date_string,
+        'power': power_res
+    })
 
-user_interface.plot_power_output(date, power)
+user_interface.plot_power_output(results)
+user_interface.write_to_csv(results)
