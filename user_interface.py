@@ -35,13 +35,13 @@ def plot_power_output(results, orbit): #TODO make more generic so we could plot 
     plt.title(plot_title)
     plt.tight_layout()
     plt.show()
-    fig.savefig(f"./plots/{filename}", transparent=False, dpi=80)
+    fig.savefig(f"./plot_results/{filename}", transparent=False, dpi=80)
 
 
 def write_to_csv(results, orbit):
-    csv_title = generate_file_name(orbit, '.csv')
+    csv_title = generate_file_name(orbit, '.csv_results')
     header = ['date', 'power']
-    with open(f"./csv/{csv_title}", 'w', encoding='UTF8', newline='') as f:
+    with open(f"csv_results/{csv_title}", 'w', encoding='UTF8', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=header)
         writer.writeheader()
         writer.writerows(results)

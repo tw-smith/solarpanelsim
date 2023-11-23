@@ -4,5 +4,5 @@ orekit-data.zip
 *.png
 .DS_Store
 **/.DS_Store
-/plots/*
-/csv/*
+plot_results/*
+csv_results/*
