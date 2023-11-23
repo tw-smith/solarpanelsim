@@ -1,0 +1,6 @@
+name: SolarSimEnv
+channels:
+  - defaults
+dependencies:
+  - orekit
+prefix: /Users/altnaharra/miniconda3/envs/SolarSimEnv
