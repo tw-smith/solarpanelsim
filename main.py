@@ -1,19 +1,17 @@
-import math
-
+import datetime
+import os.path
 import orekit
 
-import user_interface
-import panel_power_calculator
+vm = orekit.initVM() #TODO move this further down if we can
 
-vm = orekit.initVM()
-
-import os.path
-import datetime
 import orekit.pyhelpers
 from org.orekit.time import AbsoluteDate, TimeScalesFactory
 
 from orbit_propagator import OrbitCreator, OrbitPropagator
 from angle_calculators import AngleCalculator
+import user_interface
+import panel_power_calculator
+from user_interface import OutputManager
 
 if not os.path.isfile('orekit-data.zip'):
     orekit.pyhelpers.download_orekit_data_curdir()
@@ -27,9 +25,9 @@ utc = TimeScalesFactory.getUTC()
 
 apogee = 500 * 1000
 perigee = 500 * 1000
-i = 45.0
+i = 70.0
 omega = 0.0
-raan = 0.0
+raan = 45.0
 initial_lv = 0.0
 initialDate = AbsoluteDate(2023, 3, 21, 12, 0, 0.0, utc)
 finalDate = AbsoluteDate(2023, 3, 21, 18, 0, 0.0, utc) # TODO input checks e.g. is initialDate before final date, apogee and perigee etc
@@ -60,5 +58,7 @@ for state in state_history:
         'power': power_res
     })
 
-user_interface.plot_power_output(results, orbit)
-user_interface.write_to_csv(results, orbit)
+output_manager = OutputManager(results, orbit)
+output_manager.plot_power_output()
+output_manager.write_to_csv()
+
