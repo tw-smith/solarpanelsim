@@ -10,6 +10,7 @@ class AngleCalculator:
         self.arg_of_periapsis = orbit.getPerigeeArgument()
         self.true_anomaly = spacecraft_state.getLv()
         self.obliquity = math.radians(23.45)
+        # TODO is durationFrom correct here? Does it account for leap years etc? Check orekit docs
         seconds_since_J2000 = spacecraft_state.getDate().durationFrom(AbsoluteDate.J2000_EPOCH)
         self.days_since_J2000 = seconds_since_J2000 / 86400
 
