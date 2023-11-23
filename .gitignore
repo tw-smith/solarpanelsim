@@ -1,5 +1,7 @@
 orekit-data.zip
 .idea/
+.pytest_cache
+*.log
 *.csv
 *.png
 .DS_Store

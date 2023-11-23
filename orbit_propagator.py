@@ -4,8 +4,9 @@ from org.orekit.propagation.analytical import KeplerianPropagator
 from org.orekit.utils import Constants
 from org.orekit.frames import FramesFactory
 
+
 class OrbitCreator:
-    def __init__(self, orbit_creation_parameters): #TODO change to parameter object
+    def __init__(self, orbit_creation_parameters):
         self.apogee = orbit_creation_parameters['apogee']
         self.perigee = orbit_creation_parameters['perigee']
         self.inclination = math.radians(orbit_creation_parameters['i'])
@@ -13,11 +14,9 @@ class OrbitCreator:
         self.raan = math.radians(orbit_creation_parameters['raan'])
         self.initial_lv = math.radians(orbit_creation_parameters['initial_lv'])
         self.initial_date = orbit_creation_parameters['initial_date']
-        self.current_date = orbit_creation_parameters['initial_date'] #TODO duplication
         self.inertial_frame = FramesFactory.getEME2000()
         a = (self.perigee + self.apogee + (2*Constants.WGS84_EARTH_EQUATORIAL_RADIUS)) / 2
         e = 1.0 - (self.perigee + Constants.WGS84_EARTH_EQUATORIAL_RADIUS) / a
-
         self.orbit = KeplerianOrbit(
             a,
             e,
@@ -50,5 +49,4 @@ class OrbitPropagator:
             current_state = self.propagator.propagate(self.current_time)
             state_history.append(current_state)
             self.current_time = self.current_time.shiftedBy(self.timestep)
-        return state_history # TODO maybe we only need to return true anomaly from this?
-
+        return state_history
