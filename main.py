@@ -9,7 +9,6 @@ from org.orekit.time import AbsoluteDate, TimeScalesFactory
 
 from orbit_propagator import OrbitCreator, OrbitPropagator
 from angle_calculators import AngleCalculator
-import user_interface
 import panel_power_calculator
 from user_interface import OutputManager
 
@@ -23,35 +22,34 @@ orekit.pyhelpers.setup_orekit_curdir()
 #TODO investigate possible offset between UTC and the time we use to calculate J2000 offset in AngleCalculators?
 utc = TimeScalesFactory.getUTC()
 
-apogee = 500 * 1000
-perigee = 500 * 1000
-i = 70.0
-omega = 0.0
-raan = 45.0
-initial_lv = 0.0
-initialDate = AbsoluteDate(2023, 3, 21, 12, 0, 0.0, utc)
-finalDate = AbsoluteDate(2023, 3, 21, 18, 0, 0.0, utc) # TODO input checks e.g. is initialDate before final date, apogee and perigee etc
-timeStep = float(0.05*3600)
-panel_area = 1
-panel_efficiency = 0.3 #TODO look up typical values
+propagation_parameters = {
+    'initial_date': AbsoluteDate(2023, 3, 21, 12, 0, 0.0, utc),
+    'final_date': AbsoluteDate(2023, 3, 21, 18, 0, 0.0, utc),
+    'timestep': float(0.05*3600)
+}
 
-orbit = OrbitCreator(
-    apogee,
-    perigee,
-    i,
-    omega,
-    raan,
-    initial_lv,
-    initialDate
-).get_orbit()
+orbit_creation_parameters = {
+    'apogee': 500*1000,
+    'perigee': 500*1000,
+    'i': 70.0,
+    'omega': 0.0,
+    'raan': 45.0,
+    'initial_lv': 0.0,
+    'initial_date': propagation_parameters['initial_date']
+}
 
-print(orbit)
-state_history = OrbitPropagator(orbit, initialDate, finalDate, timeStep).propagate_orbit()
+panel_parameters = {
+    'panel_area': 1.0,
+    'panel_efficiency': 0.3
+}
+
+orbit = OrbitCreator(orbit_creation_parameters).get_orbit()
+state_history = OrbitPropagator(orbit, propagation_parameters).propagate_orbit()
 
 results = []
 for state in state_history:
     angle_calculator = AngleCalculator(state, orbit)
-    power_res = panel_power_calculator.calculate_panel_power(panel_area, angle_calculator, panel_efficiency)
+    power_res = panel_power_calculator.calculate_panel_power(panel_parameters, angle_calculator)
     date_string = datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339())
     results.append({
         'date': date_string,
@@ -61,4 +59,3 @@ for state in state_history:
 output_manager = OutputManager(results, orbit)
 output_manager.plot_power_output()
 output_manager.write_to_csv()
-
