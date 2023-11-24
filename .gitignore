@@ -1,6 +1,7 @@
 orekit-data.zip
 .idea/
 .pytest_cache
+.__pycache__
 *.log
 *.csv
 *.png

@@ -1,8 +1,8 @@
 name: SolarSimEnv
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - orekit
   - matplotlib
   - pytest
-prefix: /Users/altnaharra/miniconda3/envs/SolarSimEnv
