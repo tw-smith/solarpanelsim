@@ -36,7 +36,11 @@ def solarsimulator(input_params=None):
     for state in state_history:
         angle_calculator = AngleCalculator(state, orbit)
         power_res = panel_power_calculator.calculate_panel_power(panel_parameters, angle_calculator)
-        date_string = datetime.datetime.fromisoformat(state.getDate().getComponents(0).toStringRfc3339())
+        state_rfc3339_date = state.getDate().getComponents(0).toStringRfc3339()
+        # We need to strip the Z from the end of the RFC3339 string to stay compatible with Python versions before 3.11
+        # https://docs.python.org/3/library/datetime.html#datetime.time.fromisoformat
+        python_friendly_date = state_rfc3339_date.replace('Z', '')
+        date_string = datetime.datetime.fromisoformat(python_friendly_date)
         results.append({
             'date': date_string,
             'power': power_res

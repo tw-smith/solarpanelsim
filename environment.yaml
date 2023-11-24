@@ -3,6 +3,6 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - orekit
+  - orekit=12.0
   - matplotlib
   - pytest
