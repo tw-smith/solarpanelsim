@@ -26,7 +26,7 @@ class OrbitCreator:
             self.initial_lv,
             PositionAngleType.TRUE,
             self.inertial_frame,
-            self.initial_date, #TODO check if this is initial date or  some sort of epoch date
+            self.initial_date,
             Constants.WGS84_EARTH_MU
         )
 

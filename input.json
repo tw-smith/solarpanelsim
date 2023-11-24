@@ -6,9 +6,9 @@
 
   },
   "orbit_creation_parameters": {
-    "apogee": 500,
-    "perigee": 500,
-    "i": 0,
+    "apogee": 1200,
+    "perigee": 900,
+    "i": 25.0,
     "omega": 0.0,
     "raan": 45.0,
     "initial_lv": 0.0

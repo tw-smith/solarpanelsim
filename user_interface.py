@@ -13,17 +13,20 @@ class InputManager:
         self.parameter_input = parameter_input
 
     def get_parameter_inputs(self):
+        # Logic to retrieve a parameter dictionary from either an input.json file or a dictionary passed directly to
+        # SolarPanelSim
         if isinstance(self.parameter_input, str):
             with open(self.parameter_input) as f:
                 parameter_dict = json.load(f)
         if isinstance(self.parameter_input, dict):
             parameter_dict = self.parameter_input
 
+        # Get validated input parameters from UserInputValidator (which also splits the overall parameter_dict down into
+        # its constituent orbit, propagation and panel parameters dictionaries)
         orbit_creation_parameters, propagation_parameters, panel_parameters = UserInputValidator(parameter_dict).validate_input()
 
         # Convert initial and final datetime objects to Orekit AbsoluteDates
         utc = TimeScalesFactory.getUTC()
-        # TODO investigate possible offset between UTC and the time we use to calculate J2000 offset in AngleCalculators?
         initial_date_orekit = AbsoluteDate(
             propagation_parameters['initial_date'].year,
             propagation_parameters['initial_date'].month,
@@ -56,6 +59,8 @@ class InputManager:
 class OutputManager:
     def __init__(self, results, orbit):
         self.results = results
+
+        # We need a filename for both csv and plotting outputs so build it here for DRY
         self.filename = (f"a{orbit.getA()}_"
                          f"e{round(orbit.getE(), 3)}_"
                          f"i{math.degrees(orbit.getI())}_"
@@ -71,7 +76,7 @@ class OutputManager:
             writer.writeheader()
             writer.writerows(self.results)
 
-    def plot_power_output(self): #TODO make more generic so we could plot things like angles vs time etc
+    def plot_power_output(self):
         plot_title = self.filename.replace('p', '.')
         plot_title = plot_title.replace('_', ' ')
         fig, ax = plt.subplots()
