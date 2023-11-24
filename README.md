@@ -66,8 +66,8 @@ An example showing how the input data should be formatted (whether in JSON or Py
 		"initial_lv": 0.0
 	},
 	"propagation_parameters": {
-		"initial_date": "2023-03-21T12:00:00.0Z",
-		"final_date": "2023-03-21T18:00:00.0Z",
+		"initial_date": "2023-03-21T12:00:00",
+		"final_date": "2023-03-21T18:00:00",
 		"timestep": 180.0
 	},
 	"panel_parameters": {
