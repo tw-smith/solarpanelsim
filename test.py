@@ -1,7 +1,9 @@
+import faulthandler
+
 import pytest
 import math
 from angle_calculators import AngleCalculator
-from errors_and_validation import UserInputValidator
+from errors_and_validation import UserInputValidator, UserInputError
 
 # Tried to implement tests but encountered an error where Python would encounter a
 # fatal  error/segmentation fault and Pytest would crash. Suspect it is something to
@@ -16,13 +18,112 @@ from errors_and_validation import UserInputValidator
 # - Does the output manager create the required directories when they don't exist?
 # - Does the solar panel power calculator calculate the correct values, including setting to zero when effective area is "negative"?
 
+# After some research, disabling the Pytest fault handler with the command below stops the segfault halting tests, but I
+# would still like to find out exactly what is going on before blindly relying on this approach.
 
-def test_user_input_validation(set_propagation_parameters, set_orbit_creation_parameters, set_panel_parameters):
-    propagation_parameters = set_propagation_parameters
-    orbit_parameters = set_orbit_creation_parameters
-    propagation_parameters['apogee'] = -4000
-    validator = UserInputValidator(propagation_parameters, orbit_parameters, set_panel_parameters)
-    with pytest.raises(Exception):
+# https://stackoverflow.com/questions/57523762/pytest-windows-fatal-exception-code-0x8001010d
+# https://gitlab.orekit.org/orekit-labs/python-wrapper/-/issues/430
+faulthandler.disable()
+
+
+def test_user_input_validation_missing_panel_params(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary.pop('panel_parameters')
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_missing_orbit_params(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary.pop('orbit_creation_parameters')
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_missing_propagation_params(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary.pop('propagation_parameters')
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_missing_apogee(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['orbit_creation_parameters'].pop('apogee')
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_missing_final_date(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['propagation_parameters'].pop('final_date')
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_missing_panel_area(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['panel_parameters'].pop('panel_area')
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_date_mismatch(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['propagation_parameters']['final_date'] = "2023-03-20T12:00:00"
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_negative_timestep(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['propagation_parameters']['timestep'] = -0.5
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_negative_apogee(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['orbit_creation_parameters']['apogee'] = -4000
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_negative_perigee(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['orbit_creation_parameters']['perigee'] = -4000
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_apogee_perigee_mismatch(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['orbit_creation_parameters']['apogee'] = input_parameter_dictionary['orbit_creation_parameters']['perigee'] - 5
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_negative_panel_area(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['panel_parameters']['panel_area'] = -1
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
+        validator.validate_input()
+
+
+def test_user_input_validation_negative_panel_efficiency(set_input_parameter_dictionary):
+    input_parameter_dictionary = set_input_parameter_dictionary
+    input_parameter_dictionary['panel_parameters']['panel_efficiency'] = -1
+    validator = UserInputValidator(input_parameter_dictionary)
+    with pytest.raises(UserInputError):
         validator.validate_input()
 
 
