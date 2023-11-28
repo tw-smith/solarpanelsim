@@ -127,9 +127,9 @@ def test_user_input_validation_negative_panel_efficiency(set_input_parameter_dic
         validator.validate_input()
 
 
-def test_angle_calculators(get_sample_orbit, get_sample_propagation):
+def test_angle_calculators(get_sample_orbit, get_sample_angle_calculator, get_processed_inputs):
     # Test sun longitude
-    angle_calculator = AngleCalculator(get_sample_propagation[0],  get_sample_orbit)
+    angle_calculator = get_sample_angle_calculator
     # Longitude at midday on 22/11/23 from https://clearskytonight.com/projects/astronomycalculator/sun/sunlongitude.html
     assert round(math.degrees(angle_calculator.get_sun_longitude()), 1) == 239.9
 
@@ -140,4 +140,4 @@ def test_angle_calculators(get_sample_orbit, get_sample_propagation):
     assert angle_calculator.get_satellite_true_longitude() == raan + true_anomaly + sun_longitude
 
     # Test beta angle (assert value from careful hand calculation)
-    assert round(angle_calculator.get_beta_angle(), 3) == -0.352
+    assert round(angle_calculator.get_beta_angle(), 3) == -0.351

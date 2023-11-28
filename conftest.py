@@ -7,19 +7,13 @@ import orekit.pyhelpers
 from org.orekit.time import AbsoluteDate, TimeScalesFactory
 from orbit_propagator import OrbitCreator, OrbitPropagator
 from angle_calculators import AngleCalculator
+from user_interface import InputManager
 from errors_and_validation import UserInputValidator
 orekit.pyhelpers.setup_orekit_curdir()
 
 # Tried to implement a Pytest test suite but encountered a cryptic Python fatal error/segmentation
 # fault, possibly related to the interaction between the Java VM  used by Orekit and Pytest. Please
 # see test.py for more information.
-
-
-@pytest.fixture(scope="function")
-def set_vm():
-    #vm = orekit.initVM()
-    yield vm
-
 
 
 @pytest.fixture(scope="function")
@@ -34,8 +28,8 @@ def set_panel_parameters():
 @pytest.fixture(scope="function")
 def set_propagation_parameters():
     propagation_parameters = {
-        'initial_date': "2023-03-21T12:00:00",
-        'final_date': "2023-03-21T18:00:00",
+        'initial_date': "2023-11-22T12:00:00",
+        'final_date': "2023-11-22T18:00:00",
         'timestep': float(0.05 * 3600)
     }
     yield propagation_parameters
@@ -66,22 +60,20 @@ def set_input_parameter_dictionary(set_panel_parameters, set_propagation_paramet
 
 
 @pytest.fixture(scope="function")
-def get_sample_orbit(set_input_parameter_dictionary):
-    validator = UserInputValidator(set_input_parameter_dictionary)
-    orbit_creation_parameters, _, _ = validator.validate_input()
-    orbit = OrbitCreator(orbit_creation_parameters).get_orbit()
+def get_processed_inputs(set_input_parameter_dictionary):
+    orbit_creation_parameters, propagation_parameters, panel_parameters = InputManager(set_input_parameter_dictionary).get_parameter_inputs()
+    yield [orbit_creation_parameters, propagation_parameters, panel_parameters]
+
+
+@pytest.fixture(scope="function")
+def get_sample_orbit(get_processed_inputs):
+    orbit = OrbitCreator(get_processed_inputs[0]).get_orbit()
     yield orbit
 
 
 @pytest.fixture(scope="function")
-def get_sample_propagation(get_sample_orbit, set_input_parameter_dictionary):
-    validator = UserInputValidator(set_input_parameter_dictionary)
-    _, propagation_parameters, _ = validator.validate_input()
-    orbit_propagator = OrbitPropagator(get_sample_orbit, propagation_parameters)
-    yield orbit_propagator.propagate_orbit()
-
-
-@pytest.fixture(scope="function")
-def get_sample_angle_calculator(get_sample_propagation, get_sample_orbit):
-    yield AngleCalculator(get_sample_propagation[0], get_sample_orbit)
+def get_sample_angle_calculator(get_processed_inputs):
+    orbit = OrbitCreator(get_processed_inputs[0]).get_orbit()
+    propagation = OrbitPropagator(orbit, get_processed_inputs[1]).propagate_orbit()
+    yield AngleCalculator(propagation[0], orbit)
 
