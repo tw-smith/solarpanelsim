@@ -8,7 +8,7 @@ class AngleCalculator:
         self.raan = orbit.getRightAscensionOfAscendingNode()
         self.inclination = orbit.getI()
         self.arg_of_periapsis = orbit.getPerigeeArgument()
-        self.true_anomaly = spacecraft_state.getLv()
+        self.true_longitude = spacecraft_state.getLv()
         self.obliquity = math.radians(23.44)
         seconds_since_J2000 = spacecraft_state.getDate().durationFrom(AbsoluteDate.J2000_EPOCH)
         self.days_since_J2000 = seconds_since_J2000 / 86400
@@ -30,4 +30,4 @@ class AngleCalculator:
         )
 
     def get_satellite_true_longitude(self):
-        return self.get_sun_longitude() + self.raan + self.true_anomaly
+        return self.get_sun_longitude() + self.true_longitude

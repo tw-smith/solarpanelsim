@@ -7,8 +7,8 @@ from org.orekit.frames import FramesFactory
 
 class OrbitCreator:
     def __init__(self, orbit_creation_parameters):
-        self.apogee = orbit_creation_parameters['apogee']
-        self.perigee = orbit_creation_parameters['perigee']
+        self.apogee = orbit_creation_parameters['apogee'] * 1000
+        self.perigee = orbit_creation_parameters['perigee'] * 1000
         self.inclination = math.radians(orbit_creation_parameters['i'])
         self.arg_of_periapsis = math.radians(orbit_creation_parameters['omega'])
         self.raan = math.radians(orbit_creation_parameters['raan'])
